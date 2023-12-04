@@ -3,9 +3,10 @@
 import React, { Component } from 'react';
 import TestUtils from 'react-dom/test-utils';
 import { expect } from 'chai';
-import NotificationSystem from 'NotificationSystem';
-import { positions, levels } from 'constants';
+import { NotificationSystem, constants } from '../src';
 import merge from 'object-assign';
+
+const { positions, levels } = constants;
 
 const defaultNotification = {
   title: 'This is a title',
@@ -453,7 +454,7 @@ describe('Notification Component', function() {
   it('should render 2nd notification below 1st one', done => {
     component.addNotification(merge({}, defaultNotification, {title: '1st'}));
     component.addNotification(merge({}, defaultNotification, {title: '2nd'}));
-    
+
     const notifications = TestUtils.scryRenderedDOMComponentsWithClass(instance, 'notification');
     expect(notifications[0].getElementsByClassName('notification-title')[0].textContent).to.equal('1st');
     expect(notifications[1].getElementsByClassName('notification-title')[0].textContent).to.equal('2nd');
