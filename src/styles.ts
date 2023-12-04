@@ -258,4 +258,4 @@ var STYLES = {
   }
 };
 
-module.exports = STYLES;
+export default STYLES;

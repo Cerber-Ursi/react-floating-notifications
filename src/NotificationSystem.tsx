@@ -1,9 +1,9 @@
-var React = require('react');
-var PropTypes = require('prop-types');
-var merge = require('object-assign');
-var NotificationContainer = require('./NotificationContainer');
-var Constants = require('./constants');
-var Styles = require('./styles');
+import React from 'react';
+import PropTypes from 'prop-types';
+import merge from 'object-assign';
+import NotificationContainer from './NotificationContainer';
+import Constants from './constants';
+import Styles from './styles';
 
 class NotificationSystem extends React.Component {
   constructor() {
@@ -292,4 +292,4 @@ NotificationSystem.defaultProps = {
   newOnTop: false
 };
 
-module.exports = NotificationSystem;
+export default NotificationSystem;

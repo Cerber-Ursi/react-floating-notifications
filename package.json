@@ -10,7 +10,7 @@
     "prebuild": "npm run prepare-build",
     "build": "jsx -x jsx ./src ./dist & jsx ./src ./dist && webpack --stats --config webpack.config.umd.prod.js && webpack --stats --config webpack.config.umd.dev.js",
     "lint": "eslint src --ext .jsx,.js",
-    "start": "NODE_ENV=development node devServer.js",
+    "start": "env NODE_ENV=development node devServer.js",
     "build:example": "rimraf example/build/ && webpack --stats --config webpack.config.prod.js"
   },
   "repository": {
@@ -66,18 +66,19 @@
     "karma-sourcemap-loader": "^0.3.6",
     "karma-webpack": "^1.7.0",
     "mocha": "^4.0.1",
-    "node-sass": "^4.13.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-tools": "^0.13.2",
     "react-transform-catch-errors": "^1.0.0",
     "react-transform-hmr": "^1.0.1",
-    "redbox-react": "^1.1.1",
     "rimraf": "^2.4.3",
+    "sass": "1.69.5",
     "sass-loader": "^3.0.0",
     "style-loader": "^0.12.4",
+    "typescript": "^5.3.2",
     "webpack": "^1.12.2",
     "webpack-dev-middleware": "^1.2.0",
     "webpack-hot-middleware": "^2.4.1"
-  }
+  },
+  "packageManager": "yarn@4.0.2"
 }

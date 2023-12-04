@@ -1,9 +1,9 @@
-var React = require('react');
-var PropTypes = require('prop-types');
-var ReactDOM = require('react-dom');
-var Constants = require('./constants');
-var Helpers = require('./helpers');
-var merge = require('object-assign');
+import React from 'react';
+import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
+import Constants from './constants';
+import Helpers from './helpers';
+import merge from 'object-assign';
 
 /* From Modernizr */
 var whichTransitionEvent = function() {
@@ -381,4 +381,4 @@ NotificationItem.defaultProps = {
   allowHTML: false
 };
 
-module.exports = NotificationItem;
+export default NotificationItem;
