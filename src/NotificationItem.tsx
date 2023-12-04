@@ -1,14 +1,15 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
+import React = require('react');
+import ReactDOM = require('react-dom');
+import merge = require('object-assign');
 import Constants from './constants';
-import Helpers from './helpers';
-import merge from 'object-assign';
+import {Timer} from './helpers';
+import {GetStyles, Notification} from "./NotificationSystem";
+import {CSSProperties} from "react";
 
 /* From Modernizr */
 var whichTransitionEvent = function() {
   var el = document.createElement('fakeelement');
-  var transition;
+  var transition: string | undefined;
   var transitions = {
     transition: 'transitionend',
     OTransition: 'oTransitionEnd',
@@ -17,20 +18,62 @@ var whichTransitionEvent = function() {
   };
 
   Object.keys(transitions).forEach(function(transitionKey) {
-    if (el.style[transitionKey] !== undefined) {
-      transition = transitions[transitionKey];
+    // TODO - корректная типизация
+    let key = transitionKey as (keyof typeof transitions & keyof CSSStyleDeclaration);
+    if (el.style[key] !== undefined) {
+      transition = transitions[key];
     }
   });
+
+  if (!transition) {
+    throw new Error("Transitions are not supported");
+  }
 
   return transition;
 };
 
-function _allowHTML(string) {
+function _allowHTML(string: string) {
   return { __html: string };
 }
 
-class NotificationItem extends React.Component {
-  constructor(props) {
+interface Props {
+  notification: Notification;
+  getStyles: GetStyles;
+  onRemove: (_: string | number) => void;
+  allowHTML: boolean;
+  noAnimation: boolean;
+  children: React.ReactNode;
+}
+
+interface Styles {
+  // TODO - корректная типизация
+  notification: CSSProperties & { isVisible?: {opacity: number}, isHidden?: {opacity: number}};
+  messageWrapper: CSSProperties;
+  actionWrapper: CSSProperties;
+  dismiss: CSSProperties;
+  action: CSSProperties;
+  title: CSSProperties
+}
+
+interface State {
+  visible?: boolean;
+  removed: boolean;
+}
+
+class NotificationItem extends React.Component<Props, State> {
+  static defaultProps = {
+    noAnimation: false,
+    onRemove: function() {},
+    allowHTML: false
+  };
+  private _notificationTimer: Timer | null;
+  private _height: number;
+  private _noAnimation: boolean | null;
+  private _isMounted: boolean;
+  private _removeCount: number;
+  private _styles: Styles;
+
+  constructor(props: Props) {
     super(props);
     this._notificationTimer = null;
     this._height = 0;
@@ -76,7 +119,8 @@ class NotificationItem extends React.Component {
 
   _getCssPropertyByPosition() {
     var position = this.props.notification.position;
-    var css = {};
+    // TODO - корректная типизация
+    var css: {property: string; value: number} = {} as any;
 
     switch (position) {
     case Constants.positions.tl:
@@ -115,7 +159,7 @@ class NotificationItem extends React.Component {
     return css;
   }
 
-  _defaultAction(event) {
+  _defaultAction(event: React.MouseEvent) {
     var notification = this.props.notification;
 
     event.preventDefault();
@@ -176,7 +220,8 @@ class NotificationItem extends React.Component {
     var self = this;
     var transitionEvent = whichTransitionEvent();
     var notification = this.props.notification;
-    var element = ReactDOM.findDOMNode(this);
+    // TODO - поменять на ref
+    var element = ReactDOM.findDOMNode(this) as HTMLElement;
 
     this._height = element.offsetHeight;
 
@@ -192,7 +237,7 @@ class NotificationItem extends React.Component {
     }
 
     if (notification.autoDismiss) {
-      this._notificationTimer = new Helpers.Timer(function() {
+      this._notificationTimer = new Timer(function() {
         self._hideNotification();
       }, notification.autoDismiss * 1000);
     }
@@ -202,14 +247,14 @@ class NotificationItem extends React.Component {
 
   _handleMouseEnter() {
     var notification = this.props.notification;
-    if (notification.autoDismiss) {
+    if (notification.autoDismiss && this._notificationTimer) {
       this._notificationTimer.pause();
     }
   }
 
   _handleMouseLeave() {
     var notification = this.props.notification;
-    if (notification.autoDismiss) {
+    if (notification.autoDismiss && this._notificationTimer) {
       this._notificationTimer.resume();
     }
   }
@@ -226,7 +271,8 @@ class NotificationItem extends React.Component {
   }
 
   componentWillUnmount() {
-    var element = ReactDOM.findDOMNode(this);
+    // TODO - переделать на ref
+    var element = ReactDOM.findDOMNode(this) as HTMLElement;
     var transitionEvent = whichTransitionEvent();
     element.removeEventListener(transitionEvent, this._onTransitionEnd);
     this._isMounted = false;
@@ -235,7 +281,8 @@ class NotificationItem extends React.Component {
   render() {
     var notification = this.props.notification;
     var className = 'notification notification-' + notification.level;
-    var notificationStyle = merge({}, this._styles.notification);
+    // TODO - корректная типизация (вариант с cssProperties выбрасывает TS2590)
+    var notificationStyle: Record<string, any> = merge({}, this._styles.notification);
     var cssByPos = this._getCssPropertyByPosition();
     var dismiss = null;
     var actionButton = null;
@@ -365,20 +412,5 @@ class NotificationItem extends React.Component {
     );
   }
 }
-
-NotificationItem.propTypes = {
-  notification: PropTypes.object,
-  getStyles: PropTypes.object,
-  onRemove: PropTypes.func,
-  allowHTML: PropTypes.bool,
-  noAnimation: PropTypes.bool,
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
-};
-
-NotificationItem.defaultProps = {
-  noAnimation: false,
-  onRemove: function() {},
-  allowHTML: false
-};
 
 export default NotificationItem;

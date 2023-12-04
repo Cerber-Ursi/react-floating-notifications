@@ -339,6 +339,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chai@npm:^4.3.11":
+  version: 4.3.11
+  resolution: "@types/chai@npm:4.3.11"
+  checksum: 0c216ac4a19bfbf8318bb104d32e50704ee2ffc4b538b976c4326e6638fee121462402caa570662227a2a218810388aadb14bdbd3d3d474ec300b00695db448a
+  languageName: node
+  linkType: hard
+
 "@types/cookie@npm:^0.4.1":
   version: 0.4.1
   resolution: "@types/cookie@npm:0.4.1"
@@ -355,12 +362,76 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mocha@npm:^10.0.6":
+  version: 10.0.6
+  resolution: "@types/mocha@npm:10.0.6"
+  checksum: 4526c9e88388f9e1004c6d3937c5488a39908810f26b927173c58d52b43057f3895627dc06538e96706e08b88158885f869ec6311f6b58fd72bdef715f26d6c3
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:>=10.0.0":
   version: 20.10.3
   resolution: "@types/node@npm:20.10.3"
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 7c8a0327a29d68a0bb152ae30e8c4738638515dd599064821c9d0c1884a1efa103021cd8f8c91e690cd56b0602bb6fe0e6651a5df2337bdc85e0c0f66054b2ce
+  languageName: node
+  linkType: hard
+
+"@types/object-assign@npm:^4.0.33":
+  version: 4.0.33
+  resolution: "@types/object-assign@npm:4.0.33"
+  checksum: 7fbc399aa1140beff35a152e206bfb336dd880721f4a13cc1ea01d964ab376fa4ca2c19059145cbd777c9d3eaf724008faec8cf3becff97353c69560196af086
+  languageName: node
+  linkType: hard
+
+"@types/prop-types@npm:*":
+  version: 15.7.11
+  resolution: "@types/prop-types@npm:15.7.11"
+  checksum: e53423cf9d510515ef8b47ff42f4f1b65a7b7b37c8704e2dbfcb9a60defe0c0e1f3cb1acfdeb466bad44ca938d7c79bffdd51b48ffb659df2432169d0b27a132
+  languageName: node
+  linkType: hard
+
+"@types/react-dom@npm:17":
+  version: 17.0.25
+  resolution: "@types/react-dom@npm:17.0.25"
+  dependencies:
+    "@types/react": "npm:^17"
+  checksum: 18a95d4d684cacc697d97ae66e3c8402da2f866c053fa6a5982694aa8eb6229afcefd3bfaaab4175c1b0ef3494c881e4d25e2167aa669bcbbb84114fd02ae5ba
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:17, @types/react@npm:^17":
+  version: 17.0.71
+  resolution: "@types/react@npm:17.0.71"
+  dependencies:
+    "@types/prop-types": "npm:*"
+    "@types/scheduler": "npm:*"
+    csstype: "npm:^3.0.2"
+  checksum: d0e7f5c6f71ec4289772f2120b7f3ace0f86601fcb3a03d021601c6ccee0864977a5361969f3afb62ba3c24cebd7012c1a644430684194746e0dcf2efb893de8
+  languageName: node
+  linkType: hard
+
+"@types/scheduler@npm:*":
+  version: 0.16.8
+  resolution: "@types/scheduler@npm:0.16.8"
+  checksum: f86de504945b8fc41b1f391f847444d542e2e4067cf7e5d9bfeb5d2d2393d3203b1161bc0ef3b1e104d828dabfb60baf06e8d2c27e27ff7e8258e6e618d8c4ec
+  languageName: node
+  linkType: hard
+
+"@types/sinon@npm:^17.0.2":
+  version: 17.0.2
+  resolution: "@types/sinon@npm:17.0.2"
+  dependencies:
+    "@types/sinonjs__fake-timers": "npm:*"
+  checksum: 0794a7c2ebdef397f510db0ccbfa242d4ae52db88f0f0e23e087f569e8ff76b6466680d96209b511acc0f3c08bb70dac6e51c0c2a4f62dfd1faf34f6cb308498
+  languageName: node
+  linkType: hard
+
+"@types/sinonjs__fake-timers@npm:*":
+  version: 8.1.5
+  resolution: "@types/sinonjs__fake-timers@npm:8.1.5"
+  checksum: 2b8bdc246365518fc1b08f5720445093cce586183acca19a560be6ef81f824bd9a96c090e462f622af4d206406dadf2033c5daf99a51c1096da6494e5c8dc32e
   languageName: node
   linkType: hard
 
@@ -3340,6 +3411,13 @@ __metadata:
   bin:
     csso: ./bin/csso
   checksum: e36a1cae8f371327cbf22d6770b8827291fa4f372bbaab938d5afc869e73f0a452ba4e87738bf03bfbb3bba27770efa04a6b4acaf5f36e94f88e8c481b9df7fa
+  languageName: node
+  linkType: hard
+
+"csstype@npm:^3.0.2":
+  version: 3.1.2
+  resolution: "csstype@npm:3.1.2"
+  checksum: 32c038af259897c807ac738d9eab16b3d86747c72b09d5c740978e06f067f9b7b1737e1b75e407c7ab1fe1543dc95f20e202b4786aeb1b8d3bdf5d5ce655e6c6
   languageName: node
   linkType: hard
 
@@ -9102,6 +9180,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-floating-notifications@workspace:."
   dependencies:
+    "@types/chai": "npm:^4.3.11"
+    "@types/mocha": "npm:^10.0.6"
+    "@types/object-assign": "npm:^4.0.33"
+    "@types/react": "npm:17"
+    "@types/react-dom": "npm:17"
+    "@types/sinon": "npm:^17.0.2"
     autoprefixer-loader: "npm:^3.1.0"
     babel-core: "npm:^6.14.0"
     babel-eslint: "npm:^6.1.2"

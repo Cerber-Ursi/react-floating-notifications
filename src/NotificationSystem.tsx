@@ -1,13 +1,100 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import merge from 'object-assign';
+import React = require('react');
+import merge = require('object-assign');
 import NotificationContainer from './NotificationContainer';
 import Constants from './constants';
 import Styles from './styles';
+import {CSSProperties} from "react";
+import {Property} from "csstype";
+import NotificationItem from "./NotificationItem";
 
-class NotificationSystem extends React.Component {
-  constructor() {
-    super();
+// TODO - более точная типизация (фиксированный набор ключей)
+type Style = Record<string, Record<string, CSSProperties>>;
+
+interface Props {
+  style?: false | Style;
+  noAnimation?: boolean;
+  allowHTML?: boolean,
+  newOnTop?: boolean;
+}
+
+interface State {
+  notifications: Notification[];
+}
+
+export interface Notification {
+  className: string;
+  title: string;
+  message: string;
+  // TODO - явное перечисление
+  level: string;
+  // TODO - явное перечисление
+  position: string;
+  autoDismiss: number;
+  // TODO - явное перечисление
+  dismissible: string | boolean;
+  action: {
+    label: string;
+    callback?: () => void;
+  };
+  children: React.ReactNode;
+  uid: number | string;
+  onAdd: (_: Notification) => void;
+  onRemove: (_: Notification) => void;
+
+  // TODO - это внутреннее поле, его не надо показывать пользователям
+  ref: string;
+}
+
+const elements: Elements = {
+  notification: 'NotificationItem',
+  title: 'Title',
+  messageWrapper: 'MessageWrapper',
+  dismiss: 'Dismiss',
+  action: 'Action',
+  actionWrapper: 'ActionWrapper'
+};
+
+// TODO - явная типизация
+type Element = keyof typeof Styles;
+
+interface Elements {
+  notification: Element;
+  messageWrapper: Element;
+  actionWrapper: Element;
+  dismiss: Element;
+  action: Element;
+  title: Element
+}
+
+export interface GetStyles {
+  container: (position: keyof typeof Styles.Containers) => ({});
+  overrideWidth: null;
+  overrideStyle: {};
+  elements: Elements;
+  byElement: (element: keyof Elements) => (level: string) => CSSProperties;
+  wrapper: () => ({});
+  setOverrideStyle: (style: false | Style) => void
+}
+
+class NotificationSystem extends React.Component<Props, State> {
+  // TODO - deprecated, позже лучше отрефакторить
+  static defaultProps = {
+    style: {},
+    noAnimation: false,
+    allowHTML: false,
+    newOnTop: false
+  };
+  private uid: number;
+  private _isMounted: boolean;
+  private overrideWidth: Property.Width<number | string> | null | undefined;
+  // TODO - типизировать нормально, не смешивая
+  private overrideStyle: false | Style;
+  private _getStyles: GetStyles;
+
+  public refs: Record<string, NotificationContainer> = {};
+
+  constructor(props: Props) {
+    super(props);
     this.state = {
       notifications: []
     };
@@ -15,14 +102,6 @@ class NotificationSystem extends React.Component {
     this._isMounted = false;
     this.overrideWidth = null;
     this.overrideStyle = {};
-    this.elements = {
-      notification: 'NotificationItem',
-      title: 'Title',
-      messageWrapper: 'MessageWrapper',
-      dismiss: 'Dismiss',
-      action: 'Action',
-      actionWrapper: 'ActionWrapper'
-    };
 
     this.setOverrideStyle = this.setOverrideStyle.bind(this);
     this.wrapper = this.wrapper.bind(this);
@@ -38,7 +117,7 @@ class NotificationSystem extends React.Component {
     this._getStyles = {
       overrideWidth: this.overrideWidth,
       overrideStyle: this.overrideStyle,
-      elements: this.elements,
+      elements: elements,
       setOverrideStyle: this.setOverrideStyle,
       wrapper: this.wrapper,
       container: this.container,
@@ -47,7 +126,7 @@ class NotificationSystem extends React.Component {
   }
 
   componentDidMount() {
-    this.setOverrideStyle(this.props.style);
+    this.setOverrideStyle(this.props.style || {});
     this._isMounted = true;
   }
 
@@ -55,7 +134,7 @@ class NotificationSystem extends React.Component {
     this._isMounted = false;
   }
 
-  setOverrideStyle(style) {
+  setOverrideStyle(style: false | Style) {
     this.overrideStyle = style;
   }
 
@@ -64,8 +143,9 @@ class NotificationSystem extends React.Component {
     return merge({}, Styles.Wrapper, this.overrideStyle.Wrapper);
   }
 
-  container(position) {
-    var override = this.overrideStyle.Containers || {};
+  // TODO явное перечисление для положений (сейчас оно типизировано строго, но неявно)
+  container(position: keyof typeof Styles.Containers) {
+    var override = (this.overrideStyle || {}).Containers || {};
     if (!this.overrideStyle) return {};
 
     this.overrideWidth = Styles.Containers.DefaultStyle.width;
@@ -79,32 +159,34 @@ class NotificationSystem extends React.Component {
     }
 
     return merge(
-      {},
-      Styles.Containers.DefaultStyle,
-      Styles.Containers[position],
-      override.DefaultStyle,
-      override[position]
+        {},
+        Styles.Containers.DefaultStyle,
+        Styles.Containers[position],
+        override.DefaultStyle,
+        override[position]
     );
   }
 
-  byElement(element) {
-    return (level) => {
-      var _element = this.elements[element];
-      var override = this.overrideStyle[_element] || {};
+  byElement(element: keyof Elements) {
+    // TODO - явное перечисление
+    return (level: string): CSSProperties => {
+      var _element = elements[element];
+      var override = (this.overrideStyle || {})[_element] || {};
       if (!this.overrideStyle) return {};
       return merge(
-        {},
-        Styles[_element].DefaultStyle,
-        Styles[_element][level],
-        override.DefaultStyle,
-        override[level]
+          {},
+          // TODO корректная типизация
+          (Styles[_element] as any).DefaultStyle,
+          (Styles[_element] as any)[level],
+          override.DefaultStyle,
+          override[level]
       );
     };
   }
 
-  _didNotificationRemoved(uid) {
-    var notification;
-    var notifications = this.state.notifications.filter(function(toCheck) {
+  _didNotificationRemoved(uid: string | number) {
+    var notification: Notification | undefined;
+    var notifications = this.state.notifications.filter(function (toCheck) {
       if (toCheck.uid === uid) {
         notification = toCheck;
         return false;
@@ -113,7 +195,7 @@ class NotificationSystem extends React.Component {
     });
 
     if (this._isMounted) {
-      this.setState({ notifications: notifications });
+      this.setState({notifications: notifications});
     }
 
     if (notification && notification.onRemove) {
@@ -121,8 +203,8 @@ class NotificationSystem extends React.Component {
     }
   }
 
-  addNotification(notification) {
-    var _notification = merge({}, Constants.notification, notification);
+  addNotification(notification: Partial<Notification>) {
+    var _notification: Notification = merge({}, Constants.notification, notification);
     var notifications = this.state.notifications;
     var i;
 
@@ -141,7 +223,7 @@ class NotificationSystem extends React.Component {
     }
 
     if (
-      Object.keys(Constants.positions).indexOf(_notification.position) === -1
+        Object.keys(Constants.positions).indexOf(_notification.position) === -1
     ) {
       throw new Error("'" + _notification.position + "' is not a valid position.");
     }
@@ -149,7 +231,6 @@ class NotificationSystem extends React.Component {
     // Some preparations
     _notification.position = _notification.position.toLowerCase();
     _notification.level = _notification.level.toLowerCase();
-    _notification.autoDismiss = parseInt(_notification.autoDismiss, 10);
 
     _notification.uid = _notification.uid || this.uid;
     _notification.ref = 'notification-' + _notification.uid;
@@ -171,7 +252,7 @@ class NotificationSystem extends React.Component {
 
 
     if (typeof _notification.onAdd === 'function') {
-      notification.onAdd(_notification);
+      _notification.onAdd(_notification);
     }
 
     this.setState({
@@ -181,17 +262,19 @@ class NotificationSystem extends React.Component {
     return _notification;
   }
 
-  getNotificationRef(notification) {
+  // TODO - переписать это с использованием новых refs
+  // TODO - разобраться, нафига сюда вообще передавать целиком Notification
+  getNotificationRef(notification: string | number | Notification): NotificationItem | null {
     var foundNotification = null;
 
     Object.keys(this.refs).forEach((container) => {
       if (container.indexOf('container') > -1) {
         Object.keys(this.refs[container].refs).forEach((_notification) => {
-          var uid = notification.uid ? notification.uid : notification;
+          var uid = (notification as Notification).uid ? (notification as Notification).uid : notification as string | number;
           if (_notification === 'notification-' + uid) {
             // NOTE: Stop iterating further and return the found notification.
             // Since UIDs are uniques and there won't be another notification found.
-            foundNotification = this.refs[container].refs[_notification];
+            foundNotification = this.refs[container].refs[_notification] as NotificationItem;
           }
         });
       }
@@ -200,18 +283,18 @@ class NotificationSystem extends React.Component {
     return foundNotification;
   }
 
-  removeNotification(notification) {
+  removeNotification(notification: string | number | Notification) {
     var foundNotification = this.getNotificationRef(notification);
     return foundNotification && foundNotification._hideNotification();
   }
 
-  editNotification(notification, newNotification) {
+  editNotification(notification: string | number | Notification, newNotification: Partial<Notification>) {
     var foundNotification = null;
     // NOTE: Find state notification to update by using
     // `setState` and forcing React to re-render the component.
-    var uid = notification.uid ? notification.uid : notification;
+    var uid = (notification as Notification).uid ? (notification as Notification).uid : notification as string | number;
 
-    var newNotifications = this.state.notifications.filter(function(stateNotification) {
+    var newNotifications = this.state.notifications.filter(function (stateNotification) {
       if (uid === stateNotification.uid) {
         foundNotification = stateNotification;
         return false;
@@ -247,8 +330,9 @@ class NotificationSystem extends React.Component {
 
     if (notifications.length) {
       containers = Object.keys(Constants.positions).map((position) => {
+        let pos = position as keyof typeof Constants.positions;
         var _notifications = notifications.filter((notification) => {
-          return position === notification.position;
+          return pos === notification.position;
         });
 
         if (!_notifications.length) {
@@ -256,40 +340,26 @@ class NotificationSystem extends React.Component {
         }
 
         return (
-          <NotificationContainer
-            ref={ 'container-' + position }
-            key={ position }
-            position={ position }
-            notifications={ _notifications }
-            getStyles={ this._getStyles }
-            onRemove={ this._didNotificationRemoved }
-            noAnimation={ this.props.noAnimation }
-            allowHTML={ this.props.allowHTML }
-          />
+            <NotificationContainer
+                ref={'container-' + pos}
+                key={pos}
+                position={pos}
+                notifications={_notifications}
+                getStyles={this._getStyles}
+                onRemove={this._didNotificationRemoved}
+                noAnimation={this.props.noAnimation || false}
+                allowHTML={this.props.allowHTML || false}
+            />
         );
       });
     }
 
     return (
-      <div className="notifications-wrapper" style={ this.wrapper() }>
-        {containers}
-      </div>
+        <div className="notifications-wrapper" style={this.wrapper()}>
+          {containers}
+        </div>
     );
   }
 }
-
-NotificationSystem.propTypes = {
-  style: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
-  noAnimation: PropTypes.bool,
-  allowHTML: PropTypes.bool,
-  newOnTop: PropTypes.bool
-};
-
-NotificationSystem.defaultProps = {
-  style: {},
-  noAnimation: false,
-  allowHTML: false,
-  newOnTop: false
-};
 
 export default NotificationSystem;
