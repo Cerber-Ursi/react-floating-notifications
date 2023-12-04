@@ -7,7 +7,7 @@ import {GetStyles, Notification} from "./NotificationSystem";
 import {CSSProperties} from "react";
 
 /* From Modernizr */
-var whichTransitionEvent = function() {
+var whichTransitionEvent = function () {
   var el = document.createElement('fakeelement');
   var transition: string | undefined;
   var transitions = {
@@ -17,7 +17,7 @@ var whichTransitionEvent = function() {
     WebkitTransition: 'webkitTransitionEnd'
   };
 
-  Object.keys(transitions).forEach(function(transitionKey) {
+  Object.keys(transitions).forEach(function (transitionKey) {
     // TODO - корректная типизация
     let key = transitionKey as (keyof typeof transitions & keyof CSSStyleDeclaration);
     if (el.style[key] !== undefined) {
@@ -25,15 +25,11 @@ var whichTransitionEvent = function() {
     }
   });
 
-  if (!transition) {
-    throw new Error("Transitions are not supported");
-  }
-
   return transition;
 };
 
 function _allowHTML(string: string) {
-  return { __html: string };
+  return {__html: string};
 }
 
 interface Props {
@@ -47,7 +43,7 @@ interface Props {
 
 interface Styles {
   // TODO - корректная типизация
-  notification: CSSProperties & { isVisible?: {opacity: number}, isHidden?: {opacity: number}};
+  notification: CSSProperties & { isVisible?: { opacity: number }, isHidden?: { opacity: number } };
   messageWrapper: CSSProperties;
   actionWrapper: CSSProperties;
   dismiss: CSSProperties;
@@ -63,7 +59,8 @@ interface State {
 class NotificationItem extends React.Component<Props, State> {
   static defaultProps = {
     noAnimation: false,
-    onRemove: function() {},
+    onRemove: function () {
+    },
     allowHTML: false
   };
   private _notificationTimer: Timer | null;
@@ -120,40 +117,40 @@ class NotificationItem extends React.Component<Props, State> {
   _getCssPropertyByPosition() {
     var position = this.props.notification.position;
     // TODO - корректная типизация
-    var css: {property: string; value: number} = {} as any;
+    var css: { property: string; value: number } = {} as any;
 
     switch (position) {
-    case Constants.positions.tl:
-    case Constants.positions.bl:
-      css = {
-        property: 'left',
-        value: -200
-      };
-      break;
+      case Constants.positions.tl:
+      case Constants.positions.bl:
+        css = {
+          property: 'left',
+          value: -200
+        };
+        break;
 
-    case Constants.positions.tr:
-    case Constants.positions.br:
-      css = {
-        property: 'right',
-        value: -200
-      };
-      break;
+      case Constants.positions.tr:
+      case Constants.positions.br:
+        css = {
+          property: 'right',
+          value: -200
+        };
+        break;
 
-    case Constants.positions.tc:
-      css = {
-        property: 'top',
-        value: -100
-      };
-      break;
+      case Constants.positions.tc:
+        css = {
+          property: 'top',
+          value: -100
+        };
+        break;
 
-    case Constants.positions.bc:
-      css = {
-        property: 'bottom',
-        value: -100
-      };
-      break;
+      case Constants.positions.bc:
+        css = {
+          property: 'bottom',
+          value: -100
+        };
+        break;
 
-    default:
+      default:
     }
 
     return css;
@@ -237,7 +234,7 @@ class NotificationItem extends React.Component<Props, State> {
     }
 
     if (notification.autoDismiss) {
-      this._notificationTimer = new Timer(function() {
+      this._notificationTimer = new Timer(function () {
         self._hideNotification();
       }, notification.autoDismiss * 1000);
     }
@@ -274,7 +271,9 @@ class NotificationItem extends React.Component<Props, State> {
     // TODO - переделать на ref
     var element = ReactDOM.findDOMNode(this) as HTMLElement;
     var transitionEvent = whichTransitionEvent();
-    element.removeEventListener(transitionEvent, this._onTransitionEnd);
+    if (transitionEvent) {
+      element.removeEventListener(transitionEvent, this._onTransitionEnd);
+    }
     this._isMounted = false;
   }
 
@@ -330,7 +329,7 @@ class NotificationItem extends React.Component<Props, State> {
 
     if (notification.title) {
       title = (
-        <h4 className="notification-title" style={ this._styles.title }>
+        <h4 className="notification-title" style={this._styles.title}>
           {notification.title}
         </h4>
       );
@@ -341,15 +340,15 @@ class NotificationItem extends React.Component<Props, State> {
         message = (
           <div
             className="notification-message"
-            style={ this._styles.messageWrapper }
-            dangerouslySetInnerHTML={ _allowHTML(notification.message) }
+            style={this._styles.messageWrapper}
+            dangerouslySetInnerHTML={_allowHTML(notification.message)}
           />
         );
       } else {
         message = (
           <div
             className="notification-message"
-            style={ this._styles.messageWrapper }
+            style={this._styles.messageWrapper}
           >
             {notification.message}
           </div>
@@ -365,9 +364,9 @@ class NotificationItem extends React.Component<Props, State> {
       dismiss = (
         <span
           className="notification-dismiss"
-          onClick={ this._dismiss }
-          style={ this._styles.dismiss }
-          aria-hidden={ true }
+          onClick={this._dismiss}
+          style={this._styles.dismiss}
+          aria-hidden={true}
         >
           &times;
         </span>
@@ -378,12 +377,12 @@ class NotificationItem extends React.Component<Props, State> {
       actionButton = (
         <div
           className="notification-action-wrapper"
-          style={ this._styles.actionWrapper }
+          style={this._styles.actionWrapper}
         >
           <button
             className="notification-action-button"
-            onClick={ this._defaultAction }
-            style={ this._styles.action }
+            onClick={this._defaultAction}
+            style={this._styles.action}
           >
             {notification.action.label}
           </button>
@@ -397,11 +396,11 @@ class NotificationItem extends React.Component<Props, State> {
 
     return (
       <div
-        className={ className }
-        onClick={ this._handleNotificationClick }
-        onMouseEnter={ this._handleMouseEnter }
-        onMouseLeave={ this._handleMouseLeave }
-        style={ notificationStyle }
+        className={className}
+        onClick={this._handleNotificationClick}
+        onMouseEnter={this._handleMouseEnter}
+        onMouseLeave={this._handleMouseLeave}
+        style={notificationStyle}
         role="alert"
       >
         {title}
