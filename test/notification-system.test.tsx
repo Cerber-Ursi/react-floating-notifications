@@ -468,16 +468,21 @@ describe('Notification Component', function () {
   });
 });
 
-
+// TODO - зарефакторить, чтобы не морочиться с ref-ами
+class ElementWrapperOnTop extends Component {
+  render() {
+    return <NotificationSystem ref={ref} style={style} allowHTML={true} noAnimation={true} newOnTop={true}/>;
+  }
+}
 describe('Notification Component with newOnTop=true', function () {
-  let instance: ElementWrapper;
+  let instance: ElementWrapperOnTop;
   let component: NotificationSystem;
   let clock: sinon.SinonFakeTimers | undefined;
 
   this.timeout(10000);
 
   beforeEach(() => {
-    instance = TestUtils.renderIntoDocument(React.createElement(ElementWrapper));
+    instance = TestUtils.renderIntoDocument(React.createElement(ElementWrapperOnTop));
     component = instance.refs[ref] as NotificationSystem;
 
     clock = sinon.useFakeTimers();

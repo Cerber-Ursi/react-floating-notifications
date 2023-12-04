@@ -68,7 +68,7 @@ interface Elements {
 
 export interface GetStyles {
   container: (position: keyof typeof Styles.Containers) => ({});
-  overrideWidth: null;
+  overrideWidth: number | null;
   overrideStyle: {};
   elements: Elements;
   byElement: (element: keyof Elements) => (level: string) => CSSProperties;

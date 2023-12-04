@@ -3,7 +3,6 @@
     "target": "es2020",
     "jsx": "react",
     "module": "commonjs",
-    "rootDir": "./src",
     "declaration": true,
     "declarationMap": false,
     "sourceMap": true,
