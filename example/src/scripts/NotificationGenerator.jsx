@@ -1,8 +1,7 @@
 var React = require('react');
-var PropTypes = require('prop-types');
 
 // Styles
-require('styles/generator');
+require('../styles/generator');
 
 class NotificationGenerator extends React.Component {
   constructor() {
@@ -264,11 +263,5 @@ class NotificationGenerator extends React.Component {
     );
   }
 }
-
-NotificationGenerator.propTypes = {
-  notifications: PropTypes.func.isRequired,
-  allowHTML: PropTypes.func,
-  newOnTop: PropTypes.func
-};
 
 module.exports = NotificationGenerator;

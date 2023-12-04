@@ -1,17 +1,16 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var NotificationSystem = require('NotificationSystem');
-var constants = require('constants');
+var {NotificationSystem, constants} = require('../../../src/index');
 var NotificationGenerator = require('./NotificationGenerator');
 const showcase = require('./showcase');
 
-var _getRandomPosition = function() {
+var _getRandomPosition = function () {
   var positions = Object.keys(constants.positions);
-  return positions[Math.floor(Math.random() * ((positions.length - 1) + 1)) + 0];
+  return positions[Math.floor(Math.random() * ((positions.length - 1) + 1))];
 };
 
 // Styles
-require('styles/base');
+require('../styles/base');
 
 class NotificationSystemExample extends React.Component {
   constructor() {
@@ -31,11 +30,11 @@ class NotificationSystemExample extends React.Component {
   }
 
   _allowHTML(allow) {
-    this.setState({ allowHTML: allow });
+    this.setState({allowHTML: allow});
   }
 
   _newOnTop(newOnTop) {
-    this.setState({ newOnTop });
+    this.setState({newOnTop});
   }
 
   _showTheMagic() {
@@ -51,21 +50,21 @@ class NotificationSystemExample extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ viewHeight: window.innerHeight });
+    this.setState({viewHeight: window.innerHeight});
   }
 
   render() {
     return (
       <div className="app-container">
-        <header style={ { minHeight: this.state.viewHeight } } className="header gradient">
-          <div className="overlay" />
+        <header style={{minHeight: this.state.viewHeight}} className="header gradient">
+          <div className="overlay"/>
           <div className="content">
             <h1 className="title">React Notification System</h1>
             <h2 className="subtitle">A complete and totally customizable component for notifications in React.</h2>
             <h3 className="versions">(For React 15, 0.14 and 0.13)</h3>
 
             <div className="btn-show-magic-holder">
-              <button className="btn btn-outline btn-show-magic" onClick={ this._showTheMagic.bind(this) }>
+              <button className="btn btn-outline btn-show-magic" onClick={this._showTheMagic.bind(this)}>
                 Show me what it can do!
               </button>
               <span className="width-warning">Better experience in larger screens</span>
@@ -78,15 +77,15 @@ class NotificationSystemExample extends React.Component {
           </div>
         </header>
         <div className="wrapper">
-          <NotificationGenerator notifications={ () => this._notificationSystemInstance() } allowHTML={ this._allowHTML.bind(this) } newOnTop={ this._newOnTop.bind(this) } />
+          <NotificationGenerator notifications={() => this._notificationSystemInstance()} allowHTML={this._allowHTML.bind(this)} newOnTop={this._newOnTop.bind(this)}/>
         </div>
         <footer className="footer gradient">
-          <div className="overlay" />
+          <div className="overlay"/>
           <div className="wrapper">
             <p>Made in Brasília, Brazil by <a href="http://igorprado.com" target="_blank">Igor Prado</a>.</p>
           </div>
         </footer>
-        <NotificationSystem ref={ this._notificationSystem } allowHTML={ this.state.allowHTML } newOnTop={ this.state.newOnTop } />
+        <NotificationSystem ref={this._notificationSystem} allowHTML={this.state.allowHTML} newOnTop={this.state.newOnTop}/>
       </div>
     );
   }

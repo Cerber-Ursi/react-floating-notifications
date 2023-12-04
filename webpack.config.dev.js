@@ -1,10 +1,11 @@
 var path = require('path');
 var webpack = require('webpack');
 
-var JS_REGEX = /\.js$|\.jsx$|\.es6$|\.babel$/;
+var JS_REGEX = /\.js$|\.jsx$|\.es6$|\.babel$|\.tsx?$/;
 
 module.exports = {
-  devtool: 'eval',
+  devtool: 'source-map',
+  mode: 'development',
   entry: [
     'webpack-hot-middleware/client',
     './example/src/scripts/App'
@@ -15,35 +16,41 @@ module.exports = {
     publicPath: 'build/'
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
+    new webpack.HotModuleReplacementPlugin()
   ],
   resolve: {
-    extensions: ['', '.js', '.jsx', '.sass'],
-    modulesDirectories: ['node_modules', 'src']
+    extensions: ['', '.js', '.jsx', '.ts', '.tsx', '.sass']
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: JS_REGEX,
-        include: [
-          path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'example/src')
-        ],
-        loader: 'babel?presets=airbnb'
+        loader: 'babel-loader',
+        options: {
+          plugins: ['@babel/plugin-transform-modules-commonjs'],
+          presets: ["@babel/preset-react", "@babel/preset-typescript"]
+        }
       },
       {
         test: /\.sass$/,
-        loaders: [
+        use: [
           'style-loader',
           'css-loader',
-          'autoprefixer-loader?browsers=last 2 version',
-          'sass-loader?indentedSyntax=sass&includePaths[]=' + path.resolve(__dirname, 'example/src')
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                indentedSyntax: 'sass',
+                indentWidth: 2,
+                includePaths: [path.resolve(__dirname, 'example/src')],
+              }
+            }
+          }
         ]
       },
       {
         test: /\.(jpe?g|png|gif|svg|woff|eot|ttf)$/,
-        loader: 'file-loader',
+        type: "asset/resource",
         exclude: /node_modules/
       }
     ]
